@@ -4,7 +4,7 @@ from demo_apps_project_tests.utils.sessions import conduit
 from allure import tag, title
 from tests.conftest import dotenv
 
-user_name = dotenv.get('USER_NAME')
+user_name = dotenv.get('USERNAME_API')
 
 
 @tag('API')

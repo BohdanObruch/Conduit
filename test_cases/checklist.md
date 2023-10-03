@@ -66,7 +66,7 @@ This file contains check list for [project](https://demo.realworld.io/)
 
 # Cross browser testing
 
-- [ ] Chrome >= 60
+- [ ] Chrome >= 110
 - [ ] FireFox >= ?
 - [ ] Safari >= ?
 - [ ] Opera >= ?
@@ -74,7 +74,7 @@ This file contains check list for [project](https://demo.realworld.io/)
 
 # Cross device testing
 
-- [ ] iPhone >= 6
+- [ ] iPhone >= 12
   - [ ] Chrome
   - [ ] Safari
 

@@ -3,9 +3,10 @@ import time
 
 import pytest
 from demo_apps_project_tests.utils.sessions import conduit
-from selene.support.shared import browser
-from selenium import webdriver as webdriver_selenium
-from selenium.webdriver.chrome.options import Options
+from selene import browser
+# from selene.support.shared import browser
+# from selenium import webdriver as webdriver_selenium
+# from selenium.webdriver.chrome.options import Options
 from dotenv import dotenv_values, load_dotenv
 from demo_apps_project_tests.data.fake_data import generate_random_article_data, generate_random_user_data
 
@@ -20,19 +21,19 @@ dotenv = dotenv_values()
 user_email = dotenv.get('EMAIL')
 user_password = dotenv.get('PASSWORD')
 slug = dotenv.get('SLUG')
+web_url = dotenv.get('WEB_URL')
 
 
-#
-# @pytest.fixture(scope='function', autouse=True)
-# def browser_management():
-#     browser.config.base_url = os.getenv('selene.base_url', web_url)
-#     browser.config.browser_name = os.getenv('selene.browser_name', 'chrome')
-#     browser.config.hold_browser_open = (
-#             os.getenv('selene.hold_browser_open', 'false').lower() == 'true'
-#     )
-#     browser.config.timeout = float(os.getenv('selene.timeout', '3'))
-#     browser.config.window_width = 1920
-#     browser.config.window_height = 1080
+@pytest.fixture(scope='function', autouse=True)
+def browser_management():
+    browser.config.base_url = os.getenv('selene.base_url', web_url)
+    browser.config.browser_name = os.getenv('selene.browser_name', 'chrome')
+    browser.config.hold_browser_open = (
+            os.getenv('selene.hold_browser_open', 'false').lower() == 'true'
+    )
+    browser.config.timeout = float(os.getenv('selene.timeout', '4'))
+    browser.config.window_width = 1920
+    browser.config.window_height = 1080
 #
 #
 # DEFAULT_BROWSER_VERSION = "110.0"
