@@ -1,3 +1,4 @@
+import random
 from faker import Faker
 
 fake = Faker()
@@ -21,10 +22,11 @@ bio = generate_random_user_data()[4]
 
 def generate_random_article_data():
     title = fake.word()
-    description = fake.text()
-    body = fake.text()
+    description = fake.paragraph()
+    body = fake.paragraph()
+    num_tags = random.randint(1, 5)
     tags = []
-    for _ in range(5):
+    for _ in range(num_tags):
         tags.append(fake.word())
     return title, description, body, tags
 

@@ -179,3 +179,5 @@ def create_a_comment_for_article(user_authorization):
     assert response.status_code == 200
     id_comment = response.json()["comment"]["id"]
     return id_comment, token
+
+

@@ -6,7 +6,7 @@ password = dotenv.get('PASSWORD')
 username = dotenv.get('USERNAME')
 
 
-def test_login_user():
+def login_user():
     browser.open('/')
 
     browser.element('[href="#/login"]').click()
@@ -20,8 +20,3 @@ def test_login_user():
     browser.element('[type=submit]').click()
 
     browser.element('.navbar').should(have.text(username))
-
-
-
-
-

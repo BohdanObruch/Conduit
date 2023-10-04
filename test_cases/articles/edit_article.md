@@ -35,7 +35,7 @@ Edit article test case
 
 18. Url should be `/#/article/{slug}`
 19. Page heading should be `{new_title}`
-20. Article body should contain `{new_body}` rendered Markdown
+20. Article body should contain `{new_body}`
 21. Article should have `{new_tags}`
 
 # Where:
