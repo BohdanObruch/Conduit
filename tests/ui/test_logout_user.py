@@ -6,7 +6,7 @@ password = dotenv.get('PASSWORD')
 username = dotenv.get('USERNAME')
 
 
-def test_logout_user():
+def test_logout_user(browser_management):
     browser.open('/')
 
     browser.element('[href="#/login"]').click()

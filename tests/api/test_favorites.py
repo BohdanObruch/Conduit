@@ -1,3 +1,4 @@
+from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
 from pytest_voluptuous import S
 from demo_apps_project_tests.utils.sessions import conduit
@@ -9,8 +10,9 @@ slug = dotenv.get('SLUG')
 
 @tag('API')
 @title("Add article to favorites")
-def test_add_article_to_favorites(user_authorization):
-    token = user_authorization[0]
+def test_add_article_to_favorites():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
     }
@@ -24,8 +26,9 @@ def test_add_article_to_favorites(user_authorization):
 
 @tag('API')
 @title("Remove article from favorites")
-def test_remove_article_from_favorites(user_authorization):
-    token = user_authorization[0]
+def test_remove_article_from_favorites():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
     }

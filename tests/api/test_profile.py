@@ -1,3 +1,4 @@
+from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
 from pytest_voluptuous import S
 from demo_apps_project_tests.utils.sessions import conduit
@@ -9,8 +10,9 @@ user_name = dotenv.get('USERNAME_API')
 
 @tag('API')
 @title("Get a profile of a user of the system")
-def test_get_a_profile_of_a_user_of_the_system(user_authorization):
-    username = user_authorization[2]
+def test_get_a_profile_of_a_user_of_the_system():
+    user_data = user_authorization()
+    username = user_data["username"]
     response = conduit().get(f'/profiles/{username}')
     assert response.status_code == 200
     assert response.json()["profile"]["username"] == username
@@ -19,8 +21,9 @@ def test_get_a_profile_of_a_user_of_the_system(user_authorization):
 
 @tag('API')
 @title("Follow a user by username")
-def test_follow_a_user_by_username(user_authorization):
-    token = user_authorization[0]
+def test_follow_a_user_by_username():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
 
@@ -35,8 +38,9 @@ def test_follow_a_user_by_username(user_authorization):
 
 @tag('API')
 @title("Unfollow a user by username")
-def test_unfollow_a_user_by_username(user_authorization):
-    token = user_authorization[0]
+def test_unfollow_a_user_by_username():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
     }

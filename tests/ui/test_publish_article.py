@@ -4,7 +4,7 @@ from demo_apps_project_tests.data.fake_data import title_article, description_ar
 from demo_apps_project_tests.utils.requests_helper import input_tags, checking_tags
 
 
-def test_publish_article():
+def test_publish_article(browser_management):
     login_user()
 
     browser.should(have.url_containing('/#/'))

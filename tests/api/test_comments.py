@@ -1,4 +1,6 @@
 from demo_apps_project_tests.data.fake_data import *
+from demo_apps_project_tests.model.article import create_a_comment_for_article
+from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
 from pytest_voluptuous import S
 from demo_apps_project_tests.utils.sessions import conduit
@@ -11,8 +13,9 @@ slug = dotenv.get('SLUG')
 
 @tag('API')
 @title("Get the comments for an article")
-def test_get_the_comments_for_an_article(user_authorization):
-    token = user_authorization[0]
+def test_get_the_comments_for_an_article():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
     }
@@ -25,8 +28,11 @@ def test_get_the_comments_for_an_article(user_authorization):
 
 @tag('API')
 @title("Create a comment for an article")
-def test_create_a_comment_for_an_article(user_authorization):
-    token = user_authorization[0]
+def test_create_a_comment_for_an_article():
+    user_data = user_authorization()
+    token = user_data["token"]
+    article_data = generate_random_article_data()
+    body_article = article_data["body"]
     data = {
         "comment": {
             "body": body_article}
@@ -45,9 +51,10 @@ def test_create_a_comment_for_an_article(user_authorization):
 
 @tag('API')
 @title("Delete a comment for an article")
-def test_delete_a_comment(create_a_comment_for_article):
-    id_comment = create_a_comment_for_article[0]
-    token = create_a_comment_for_article[1]
+def test_delete_a_comment():
+    comment_data = create_a_comment_for_article()
+    id_comment = comment_data[0]
+    token = comment_data[1]
     headers = {
         'Authorization': f'Token {token}'
     }

@@ -2,7 +2,7 @@ from selene import browser, be, have
 from demo_apps_project_tests.data.fake_data import username, email, password
 
 
-def test_user_registration():
+def test_user_registration(browser_management):
     browser.open('/')
 
     browser.element('[href="#/register"]').click()

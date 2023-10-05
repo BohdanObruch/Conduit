@@ -1,4 +1,6 @@
 from demo_apps_project_tests.data.fake_data import *
+from demo_apps_project_tests.model.article import create_article
+from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
 from pytest_voluptuous import S
 from demo_apps_project_tests.utils.sessions import conduit
@@ -12,8 +14,9 @@ author = dotenv.get('AUTHOR')
 
 @tag('API')
 @title("Get most recent articles from users you follow")
-def test_getting_new_articles_from_users_follow(user_authorization):
-    token = user_authorization[0]
+def test_getting_new_articles_from_users_follow():
+    user_data = user_authorization()
+    token = user_data["token"]
     headers = {
         'Authorization': f'Token {token}'
     }
@@ -46,8 +49,9 @@ def test_most_recent_articles():
 
 @tag('API')
 @title("Create an article")
-def test_create_an_article(user_authorization):
-    token = user_authorization[0]
+def test_create_an_article():
+    user_data = user_authorization()
+    token = user_data["token"]
     data = {
         "article": {
             "title": title_article,
@@ -83,12 +87,14 @@ def test_get_an_article():
 
 @tag('API')
 @title("Update an article")
-def test_update_an_article(create_article):
-    slug_article = create_article[0]
-    token = create_article[1]
-    article_title = generate_random_article_data()[0]
-    description = generate_random_article_data()[1]
-    body = generate_random_article_data()[2]
+def test_update_an_article():
+    article_data = create_article()
+    slug_article = article_data[0]
+    token = article_data[1]
+    random_article_data = generate_random_article_data()
+    article_title = random_article_data["title"]
+    description = random_article_data["description"]
+    body = random_article_data["body"]
 
     data = {
         "article": {
@@ -114,9 +120,9 @@ def test_update_an_article(create_article):
 
 @tag('API')
 @title("Delete an article")
-def test_delete_an_article(create_article):
-    slug_article = create_article[0]
-    token = create_article[1]
+def test_delete_an_article():
+    slug_article = create_article()[0]
+    token = create_article()[1]
     headers = {
         'Authorization': f'Token {token}'
     }
