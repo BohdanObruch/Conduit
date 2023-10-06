@@ -1,13 +1,9 @@
 import json
 import logging
-import os
 
 import curlify as curlify
 from requests import Session
 import allure
-from dotenv import load_dotenv
-from demo_apps_project_tests.data.fake_data import tags_article
-from selene import browser, have
 
 
 def allure_request_logger(function):
@@ -52,11 +48,3 @@ class BaseSession(Session):
         return response
 
 
-def input_tags():
-    for tag in tags_article:
-        browser.element('[ng-model$=tagField]').type(tag).press_enter()
-
-
-def checking_tags():
-    for tag in tags_article:
-        browser.element('.tag-list').should(have.text(tag))

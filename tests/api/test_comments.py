@@ -31,7 +31,7 @@ def test_get_the_comments_for_an_article():
 def test_create_a_comment_for_an_article():
     user_data = user_authorization()
     token = user_data["token"]
-    article_data = generate_random_article_data()
+    article_data = generate_random_article()
     body_article = article_data["body"]
     data = {
         "comment": {

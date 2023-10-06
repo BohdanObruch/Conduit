@@ -21,9 +21,9 @@ email = user_data["email"]
 password = user_data["password"]
 
 
-def generate_random_article_data():
+def generate_random_article():
     article_data = {
-        "title": fake.word(),
+        "title": fake.text(max_nb_chars=80),
         "description": fake.paragraph(),
         "body": fake.paragraph(),
         "tags": []
@@ -34,7 +34,7 @@ def generate_random_article_data():
     return article_data
 
 
-article_data = generate_random_article_data()
+article_data = generate_random_article()
 title_article = article_data["title"]
 description_article = article_data["description"]
 body_article = article_data["body"]

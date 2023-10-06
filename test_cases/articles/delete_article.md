@@ -15,7 +15,7 @@ Delete article test case
 ## Open me profile
 
 5. Click `{user_name}` link in app header
-6. Url should be `/#@{user_name}` — user profile page
+6. Url should be `/#/@{user_name}` — user profile page
 
 ## Find my article
 

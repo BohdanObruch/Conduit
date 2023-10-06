@@ -91,7 +91,7 @@ def test_update_an_article():
     article_data = create_article()
     slug_article = article_data[0]
     token = article_data[1]
-    random_article_data = generate_random_article_data()
+    random_article_data = generate_random_article()
     article_title = random_article_data["title"]
     description = random_article_data["description"]
     body = random_article_data["body"]

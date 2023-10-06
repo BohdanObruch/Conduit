@@ -1,7 +1,8 @@
 from selene import browser, be, have
 from demo_apps_project_tests.model.authorization import login_user
 from demo_apps_project_tests.data.fake_data import title_article, description_article, body_article
-from demo_apps_project_tests.utils.requests_helper import input_tags, checking_tags
+from demo_apps_project_tests.utils.requests_helper import checking_tags
+from demo_apps_project_tests.model.article import input_tags
 
 
 def test_publish_article(browser_management):
