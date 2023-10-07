@@ -22,6 +22,7 @@ def login_user():
     browser.element('[type=submit]').click()
 
     browser.element('.navbar').should(have.text(user_name))
+    browser.should(have.url_containing('/#/'))
 
 
 def user_authorization():

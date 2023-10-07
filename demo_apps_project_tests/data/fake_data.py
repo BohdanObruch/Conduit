@@ -26,7 +26,8 @@ def generate_random_article():
         "title": fake.text(max_nb_chars=80),
         "description": fake.paragraph(),
         "body": fake.paragraph(),
-        "tags": []
+        "tags": [],
+        "comments": fake.paragraph()
     }
     num_tags = random.randint(1, 5)
     for _ in range(num_tags):

@@ -1,9 +1,10 @@
+import random
+
 from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.model.authorization import user_authorization
 from demo_apps_project_tests.utils.sessions import conduit
-from selene import browser, have
+from selene import browser, have, be
 from tests.conftest import dotenv
-
 
 slug = dotenv.get('SLUG')
 
@@ -44,7 +45,7 @@ def create_a_comment_for_article():
     data = {
         "comment": {
             "body": body_article}
-            }
+    }
     headers = {
         'Authorization': f'Token {token}'
     }
@@ -88,3 +89,12 @@ def delete_tags():
     article_tags = len(browser.all('.tag-list span'))
     for tag in range(article_tags):
         browser.element('[ng-click*=remove]').click()
+
+
+def open_random_article():
+
+    num_article = random.randint(0, 9)
+    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+    browser.all('article-list article-preview').should(have.size(10)).element(index=num_article).click()
+    browser.should(have.url_containing(f'/#/article/'))
+
