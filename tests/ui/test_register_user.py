@@ -17,8 +17,3 @@ def test_user_registration(browser_management):
     browser.element('[type=submit]').click()
 
     browser.element('.navbar').should(have.text(username))
-
-
-
-
-
