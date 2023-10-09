@@ -1,10 +1,12 @@
 import random
+import re
 
 from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.model.authorization import user_authorization
 from demo_apps_project_tests.utils.sessions import conduit
 from selene import browser, have, be, query, command
 from tests.conftest import dotenv
+import time
 
 slug = dotenv.get('SLUG')
 
@@ -101,7 +103,7 @@ def open_random_article():
     title = article_title.get(query.text_content)
 
     browser.should(have.url_containing(f'/#/article/'))
-    browser.element('.article-page h1').should(have.text(title))
+    browser.element('.article-page h1').with_(timeout=4).should(have.text(title))
 
 
 def check_articles():
@@ -114,3 +116,27 @@ def check_articles():
         browser.element(f'article-preview:nth-child({i}) h1').should(be.visible)
         browser.element(f'article-preview:nth-child({i}) p').should(be.visible)
         browser.element(f'article-preview:nth-child({i}) .tag-list').should(be.visible)
+
+
+def like_unlike_article():
+    browser.element('.navbar').perform(command.js.scroll_into_view)
+    counter = browser.element('.banner .article-meta favorite-btn .counter')
+    button_likes = '.banner .article-meta favorite-btn'
+
+    amount_of_likes = counter.get(query.text_content)
+    amount = int(re.sub(r'[()]|\s', '', amount_of_likes))
+
+    text = browser.all(button_likes).first.element('span').get(query.text_content)
+    text = text.strip()
+
+    browser.element(button_likes).click()
+    browser.element('.article-meta favorite-btn button.disabled').should(be.not_.in_dom)
+
+    likes = counter.get(query.text_content)
+
+    new_amount_of_likes = int(re.sub(r'[()]|\s', '', likes))
+
+    if text == 'Favorite Article':
+        assert new_amount_of_likes == amount + 1
+    else:
+        assert new_amount_of_likes == amount - 1
