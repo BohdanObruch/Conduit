@@ -23,7 +23,7 @@ This file contains test cases for [project](https://demo.realworld.io/)
 
 # Social
 * [x] [Subscribe to user](subscribe_to_user.md)
-* [ ] personal articles feed
+* [x] [Personal articles feed](personal_article_feed.md)
 * [x] [Unsubscribe from user](unsubscribe_from_user.md)
 
 # User account
