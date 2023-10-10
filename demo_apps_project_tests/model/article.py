@@ -6,7 +6,7 @@ from demo_apps_project_tests.model.authorization import user_authorization
 from demo_apps_project_tests.utils.sessions import conduit
 from selene import browser, have, be, query, command
 from tests.conftest import dotenv
-import time
+
 
 slug = dotenv.get('SLUG')
 
@@ -104,6 +104,21 @@ def open_random_article():
 
     browser.should(have.url_containing(f'/#/article/'))
     browser.element('.article-page h1').with_(timeout=4).should(have.text(title))
+
+
+def selection_of_a_random_article():
+    num_article = random.randint(0, 9)
+    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+    article_title = (browser.all('article-list article-preview').element(index=num_article).element('h1')
+                     .get(query.text_content))
+    return article_title
+
+
+def switch_to_random_page():
+    num_page = random.randint(1, 9)
+    page_pagination = browser.all('.pagination li').element(index=num_page)
+    page_pagination.element('a').perform(command.js.scroll_into_view).click()
+    page_pagination.should(have.css_class('active'))
 
 
 def check_articles():
