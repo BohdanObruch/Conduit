@@ -7,7 +7,6 @@ from demo_apps_project_tests.utils.sessions import conduit
 from selene import browser, have, be, query, command
 from tests.conftest import dotenv
 
-
 slug = dotenv.get('SLUG')
 
 
@@ -112,6 +111,23 @@ def selection_of_a_random_article():
     article_title = (browser.all('article-list article-preview').element(index=num_article).element('h1')
                      .get(query.text_content))
     return article_title
+
+
+def choosing_a_random_tag():
+    num_tag = random.randint(0, 9)
+    list_tags = browser.all('.tag-list a').element(index=num_tag)
+    tag = list_tags.get(query.text_content)
+    list_tags.click()
+    return tag
+
+
+def checking_all_articles_with_the_selected_tag(tag):
+    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+    articles = len(browser.all('article-list article-preview'))
+
+    for i in range(1, articles + 1):
+        (browser.all(f'article-list article-preview:nth-child({i}) .tag-list li').element_by(have.text(tag))
+         .should(be.visible))
 
 
 def switch_to_random_page():

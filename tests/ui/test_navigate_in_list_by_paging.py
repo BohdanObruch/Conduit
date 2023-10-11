@@ -8,7 +8,7 @@ def test_navigate_in_list_by_pagination(browser_management):
     browser.should(have.url_containing('/#/'))
 
     browser.all('article-list article-preview').should(have.size(10))
-    browser.all('.pagination').element_by_its('.page-link', have.size_greater_than(10))
+    browser.all('.pagination .page-link').should(have.size_greater_than(10))
     browser.all('.pagination').first.element('li').should(have.css_class('active'))
 
     article_title = selection_of_a_random_article()
