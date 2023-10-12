@@ -2,7 +2,7 @@ import random
 import re
 
 from demo_apps_project_tests.data.fake_data import generate_random_article
-from demo_apps_project_tests.model.authorization import user_authorization
+from demo_apps_project_tests.model.authorization import user_authorization, user_name
 from demo_apps_project_tests.utils.sessions import conduit
 from selene import browser, have, be, query, command
 from tests.conftest import dotenv
@@ -121,7 +121,7 @@ def choosing_a_random_tag():
     return tag
 
 
-def checking_all_articles_with_the_selected_tag(tag):
+def checking_selected_tag(tag):
     browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
     articles = len(browser.all('article-list article-preview'))
 
@@ -171,3 +171,29 @@ def like_unlike_article():
         assert new_amount_of_likes == amount + 1
     else:
         assert new_amount_of_likes == amount - 1
+
+
+def checking_created_posts():
+    while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
+        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
+        browser.element('.banner .article-meta [ng-click*="delete"]').click()
+        browser.should(have.url_containing('/#/'))
+        browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active'))
+        browser.element(f'.navbar [href="#/@{user_name}"]').with_(timeout=5).click()
+
+        browser.should(have.url_containing(f'/#/@{user_name}')).with_(timeout=5)
+        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+
+
+def checking_subscriptions():
+    while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
+        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
+        browser.element('.banner .article-meta [user$="article.author"] button').perform(
+            command.js.scroll_into_view).click()
+        browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
+            have.text('Follow'))
+
+        browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
+        browser.should(have.url_containing('/#/'))
+        browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active'))
+        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)

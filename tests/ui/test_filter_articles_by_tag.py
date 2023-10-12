@@ -1,5 +1,5 @@
 from selene import browser, have
-from demo_apps_project_tests.model.article import choosing_a_random_tag, checking_all_articles_with_the_selected_tag
+from demo_apps_project_tests.model.article import choosing_a_random_tag, checking_selected_tag
 
 
 def test_filter_articles_by_tag(browser_management):
@@ -15,5 +15,5 @@ def test_filter_articles_by_tag(browser_management):
     feed = browser.element('.feed-toggle')
     feed.all('.nav-item').element_by_its('a', have.css_class('active')).should(have.text(tag))
 
-    checking_all_articles_with_the_selected_tag(tag)
+    checking_selected_tag(tag)
 

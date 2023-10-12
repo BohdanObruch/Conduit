@@ -10,7 +10,7 @@ Subscribe to user test case
 
 ## Delete all my articles
 
-4. Click on button that contain username
+4. Click `{user_name}` link in app header
 5. If articles is list not empty then
     * click button **Delete**
     * go to step 4
@@ -25,7 +25,7 @@ Subscribe to user test case
 9.  Click button **Unfollow**
 10.  Confirm that the button text changes to **Follow**
 11.  Click **Home**
-12. Back to step 4
+12. Back to step 6
 
 ## Select first article
 
