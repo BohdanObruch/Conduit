@@ -192,13 +192,15 @@ def unfollow_subscriptions():
             command.js.scroll_into_view).click()
         browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
             have.text('Follow'))
+        author_name = browser.element('.banner .article-meta .author').get(query.text_content)
 
         browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
         browser.should(have.url_containing('/#/'))
         browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active')).should(
             have.text('Your Feed'))
         browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
-        browser.element('.article-preview .article-meta a.author').should(be.not_.visible)
+        browser.all('.article-preview .article-meta a.author').element_by(
+            have.text(author_name)).should(be.not_.visible)
 
 
 def follow_subscriptions():
@@ -210,9 +212,18 @@ def follow_subscriptions():
 
         browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
         browser.element('.banner .article-meta [user$="article.author"] button').perform(
-            command.js.scroll_into_view).click()
+            command.js.scroll_into_view).should(have.text('Follow')).click()
+        author_name = browser.element('.banner .article-meta .author').get(query.text_content)
         browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
             have.text('Unfollow'))
 
         browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
         browser.should(have.url_containing('/#/'))
+
+        browser.element('.feed-toggle ul > li:nth-child(1) a').should(have.css_class('active')).should(
+            have.text('Your Feed'))
+        browser.element('article-list article-preview').with_(timeout=5).should(be.visible)
+
+        browser.all('.article-preview .article-meta a.author').element_by(have.text(author_name)).should(be.visible)
+
+

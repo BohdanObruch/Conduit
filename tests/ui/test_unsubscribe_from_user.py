@@ -24,9 +24,4 @@ def test_unsubscribe_from_user(browser_management):
 
     follow_subscriptions()
 
-    browser.element('.feed-toggle ul > li:nth-child(1) a').should(have.css_class('active')).should(
-        have.text('Your Feed'))
-    browser.element('article-list article-preview').with_(timeout=5).should(be.visible)
-    browser.element('.article-preview .article-meta a.author').should(be.visible)
-
     unfollow_subscriptions()
