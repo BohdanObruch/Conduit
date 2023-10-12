@@ -173,7 +173,7 @@ def like_unlike_article():
         assert new_amount_of_likes == amount - 1
 
 
-def checking_created_posts():
+def deleting_created_posts():
     while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
         browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
         browser.element('.banner .article-meta [ng-click*="delete"]').click()
@@ -185,7 +185,7 @@ def checking_created_posts():
         browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
 
 
-def checking_subscriptions():
+def unfollow_subscriptions():
     while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
         browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
         browser.element('.banner .article-meta [user$="article.author"] button').perform(
@@ -195,5 +195,24 @@ def checking_subscriptions():
 
         browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
         browser.should(have.url_containing('/#/'))
-        browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active'))
+        browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active')).should(
+            have.text('Your Feed'))
         browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        browser.element('.article-preview .article-meta a.author').should(be.not_.visible)
+
+
+def follow_subscriptions():
+    if browser.element('article-list article-preview').with_(timeout=5).matching(be.not_.visible):
+        browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active')).should(
+            have.text('Global Feed'))
+        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        browser.all('article-list article-preview').with_(timeout=5).should(have.size(10))
+
+        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
+        browser.element('.banner .article-meta [user$="article.author"] button').perform(
+            command.js.scroll_into_view).click()
+        browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
+            have.text('Unfollow'))
+
+        browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
+        browser.should(have.url_containing('/#/'))

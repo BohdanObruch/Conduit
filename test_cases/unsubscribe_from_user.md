@@ -27,7 +27,7 @@ Unsubscribe from user test case
 8. Click **Global Feed** in feed toggle menu
 9. List should have 10 article cards
 10. Select first article
-11. Click buttun **Follow**
+11. Click button **Follow**
 12. Confirm that the button text changes to **Unfollow**
 
 ## Check user in your subscription list
