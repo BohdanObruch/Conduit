@@ -103,6 +103,7 @@ def open_random_article():
 
     browser.should(have.url_containing(f'/#/article/'))
     browser.element('.article-page h1').with_(timeout=4).should(have.text(title))
+    return title
 
 
 def selection_of_a_random_article():
