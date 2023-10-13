@@ -10,7 +10,7 @@ def test_personal_article_feed(browser_management):
         have.text('Global Feed'))
 
     article = open_random_article()
-    url_title = article.replace(" ", "-")
+    url_title = article.replace(" ", "-").replace(",", "")
     browser.should(have.url_containing(f'/#/article/{url_title}'))
 
     browser.element('.banner .article-meta [user$="article.author"] button').perform(
