@@ -1,25 +1,29 @@
-from selene import browser, have, command
+from selene import have
 
-from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.model.authorization import login_user
-from demo_apps_project_tests.model.article import open_random_article
+from allure import step
+from selene.support.shared.jquery_style import ss
+from demo_apps_project_tests.helpers import app
 
 
 def test_delete_comment(browser_management):
-    login_user()
+    with step('Before'):
+        login_user()
 
-    browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active'))
+    with step('Open random article'):
+        with step('Go to global feed tab'):
+            app.article_page.go_to_global_feed_tab()
+        with step('Open random article'):
+            app.article_page.open_random_article()
 
-    open_random_article()
-    comment = generate_random_article()
-    browser.element('textarea[ng-model$=body]').perform(command.js.scroll_into_view).click().type(comment["comments"])
-    browser.element('button[type=submit]').click()
-    browser.element('comment .card').perform(command.js.scroll_into_view)
-    browser.all('.article-page comment').element_by_its('p', have.text(comment["comments"]))
+    with step('Add comment'):
+        article = app.article_page.add_comment()
 
-    delete_comment = browser.all('.article-page comment').with_(timeout=5).element_by_its('p',
-                                                                                          have.exact_text(
-                                                                                              comment["comments"]))
-    delete_comment.element('.card-footer [ng-click*="delete"]').click()
-
-    delete_comment.should(have.no.visible)
+    with step('Delete comment'):
+        with step('Search comment'):
+            delete_comment = ss('.article-page comment').with_(timeout=5).element_by_its(
+                                                                    'p', have.exact_text(article["comments"]))
+        with step('Click delete comment button'):
+            delete_comment.element('.card-footer [ng-click*="delete"]').click()
+        with step('Check that the comment that has been deleted is not displayed'):
+            delete_comment.should(have.no.visible)

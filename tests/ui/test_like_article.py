@@ -1,15 +1,17 @@
-from selene import browser, have
-from demo_apps_project_tests.model.article import open_random_article, like_unlike_article
 from demo_apps_project_tests.model.authorization import login_user
+from allure import step
+from demo_apps_project_tests.helpers import app
 
 
 def test_like_article(browser_management):
-    login_user()
+    with step('Before'):
+        login_user()
 
-    browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active'))
+        with step('Open global feed tab'):
+            app.article_page.go_to_global_feed_tab()
 
-    browser.all('article-list article-preview').with_(timeout=5).should(have.size(10))
+    with step('Select random article'):
+        app.article_page.open_random_article()
 
-    open_random_article()
-
-    like_unlike_article()
+    with step('Like/unlike article'):
+        app.article_page.like_unlike_article()

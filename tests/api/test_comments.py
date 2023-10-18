@@ -1,4 +1,4 @@
-from demo_apps_project_tests.data.fake_data import *
+from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.model.article import create_a_comment_for_article
 from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *

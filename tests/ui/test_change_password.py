@@ -1,22 +1,28 @@
-from selene import browser, be, have
+from selene import browser, have
 from demo_apps_project_tests.model.registration import registration_user
+from allure import step
+from selene.support.shared.jquery_style import s
+from demo_apps_project_tests.helpers import app
 
 
 def test_change_password(browser_management):
-    # login_user()
+    with step('Before'):
+        user = registration_user()
 
-    user = registration_user()
+    with step('Open settings form'):
+        app.settings_form.going_to_settings()
 
-    browser.element('[href="#/settings"]').with_(timeout=5).click()
-    browser.should(have.url_containing('/#/settings'))
-    browser.element('.settings-page h1').should(have.text('Your Settings'))
+    with step('Edit settings'):
+        with step('Type new password'):
+            s('[ng-model$=password]').type(user["password"])
 
-    browser.element('[ng-submit*=submitForm]').should(be.visible)
+    with step('Submit form'):
+        s('[type="submit"]').with_(timeout=5).click()
 
-    browser.element('[ng-model$=password]').type(user["password"])
-
-    browser.element('[type="submit"]').with_(timeout=5).click()
-
-    browser.should(have.url_containing(f'/#/@{user["username"]}'))
-    browser.element('.user-info [ng-bind$=username]').with_(timeout=5).should(have.text(user["username"]))
-    browser.element('.navbar').should(have.text(user["username"]))
+    with step('Check updated settings'):
+        with step('Checking url of the page'):
+            browser.should(have.url_containing(f'/#/@{user["username"]}'))
+        with step('Checking the display of the user name in the header'):
+            s('.user-info [ng-bind$=username]').with_(timeout=5).should(have.text(user["username"]))
+        with step('Checking the display of the user name in the user-info block'):
+            s('.navbar').should(have.text(user["username"]))

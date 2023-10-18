@@ -1,7 +1,8 @@
 from selene import browser, be, have
-
+from allure import step
 from demo_apps_project_tests.utils.sessions import conduit
 from tests.conftest import dotenv
+from selene.support.shared.jquery_style import s
 
 email_user = dotenv.get('EMAIL')
 password = dotenv.get('PASSWORD')
@@ -9,20 +10,40 @@ user_name = dotenv.get('USERNAME')
 
 
 def login_user():
-    browser.open('/')
+    with step('Open website'):
+        browser.open('/')
 
-    browser.element('[href="#/login"]').click()
+    with step('Open login form'):
+        with step('Click Sign In link in app header'):
+            s('[href="#/login"]').click()
 
-    browser.should(have.url_containing('#/login'))
-    browser.should(have.title('Sign in — Conduit'))
+        with step('Checking the url of the page'):
+            browser.should(have.url_containing('#/login'))
 
-    browser.element('.auth-page form').should(be.visible)
-    browser.element('[ng-model$=email]').type(email_user)
-    browser.element('[ng-model$=password]').type(password)
-    browser.element('[type=submit]').click()
+        with step('Checking the title of the page'):
+            browser.should(have.title('Sign in — Conduit'))
 
-    browser.element('.navbar').should(have.text(user_name))
-    browser.should(have.url_containing('/#/'))
+    with step('Fill login form'):
+        with step('Checking the display of the form'):
+            s('.auth-page form').should(be.visible)
+
+        with step('Fill the form'):
+            with step('Fill email'):
+                s('[ng-model$=email]').type(email_user)
+
+            with step('Fill password'):
+                s('[ng-model$=password]').type(password)
+
+    with step('Submit form'):
+        with step('Click Sign in button'):
+            s('[type=submit]').click()
+
+    with step('Check user has been login'):
+        with step('Checking the display of the user name in the header'):
+            s('.navbar').should(have.text(user_name))
+
+        with step('Checking the url of the page'):
+            browser.should(have.url_containing('/#/'))
 
 
 def user_authorization():

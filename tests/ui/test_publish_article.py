@@ -1,21 +1,18 @@
-from selene import browser, be, have
 from demo_apps_project_tests.model.authorization import login_user
-from demo_apps_project_tests.model.article import checking_tags, fill_article
+from allure import step
+from demo_apps_project_tests.helpers import app
 
 
 def test_publish_article(browser_management):
-    login_user()
+    with step('Before'):
+        login_user()
 
-    browser.should(have.url_containing('/#/'))
+    with step('Open editor'):
+        app.article_page.open_add_new_article_page()
 
-    browser.element('[href="#/editor/"]').click()
-    browser.should(have.url_containing('/#/editor/'))
+    with step('Fill form'):
+        with step('Fill article'):
+            article = app.article_page.fill_article()
 
-    browser.element('.editor-page').should(be.visible)
-
-    article = fill_article()
-    url_title = article["title"].replace(" ", "-")
-    browser.should(have.url_containing(f'/#/article/{url_title}'))
-    browser.element('.banner h1').should(have.text(article["title"]))
-    browser.element('[ng-bind-html$=body]').should(have.text(article["body"]))
-    checking_tags(article)
+    with step('Check article data'):
+        app.article_page.check_article_data(article)

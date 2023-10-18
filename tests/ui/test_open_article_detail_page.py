@@ -1,12 +1,10 @@
-from selene import browser, have
-from demo_apps_project_tests.model.article import open_random_article
+from allure import step
+from demo_apps_project_tests.helpers import app
 
 
 def test_open_article_detail_page(browser_management):
-    browser.open('/')
+    with step('Before'):
+        app.website.open_website()
 
-    browser.should(have.url_containing('/#/'))
-
-    browser.all('article-list article-preview').should(have.size(10))
-
-    open_random_article()
+    with step('Open random article'):
+        app.article_page.open_random_article()

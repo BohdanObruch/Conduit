@@ -1,11 +1,14 @@
-import random
 import re
+import random
 
 from demo_apps_project_tests.data.fake_data import generate_random_article
-from demo_apps_project_tests.model.authorization import user_authorization, user_name
+from demo_apps_project_tests.model.authorization import user_authorization
+from demo_apps_project_tests.helpers import app
 from demo_apps_project_tests.utils.sessions import conduit
-from selene import browser, have, be, query, command
 from tests.conftest import dotenv
+from selene.support.shared.jquery_style import s, ss
+from selene import browser, have, be, command, query
+from allure import step
 
 slug = dotenv.get('SLUG')
 
@@ -59,172 +62,305 @@ def create_a_comment_for_article():
     return id_comment, token
 
 
-def clear_article():
-    browser.element('[ng-model$=title]').clear()
-    browser.element('[ng-model$=description]').clear()
-    browser.element('[ng-model$=body]').clear()
-    delete_tags()
+class ArticlePage:
+    def clear_article(self):
+        s('[ng-model$=title]').clear()
+        s('[ng-model$=description]').clear()
+        s('[ng-model$=body]').clear()
+        self.delete_tags()
+        return self
 
+    def fill_article(self):
+        with step('Generate article data'):
+            article = generate_random_article()
+        with step('Fill form'):
+            with step('Fill title'):
+                s('[ng-model$=title]').type(article["title"])
+            with step('Fill description'):
+                s('[ng-model$=description]').type(article["description"])
+            with step('Fill body'):
+                s('[ng-model$=body]').type(article["body"])
+            with step('Fill tags'):
+                self.input_tags(article)
+        with step('Save article'):
+            with step('Click on the Publish Article button'):
+                s('[type=button]').with_(timeout=5).click()
+        return article
 
-def fill_article():
-    article = generate_random_article()
-    browser.element('[ng-model$=title]').type(article["title"])
-    browser.element('[ng-model$=description]').type(article["description"])
-    browser.element('[ng-model$=body]').type(article["body"])
-    input_tags(article)
-    browser.element('[type=button]').with_(timeout=5).click()
-    return article
+    def checking_tags(self, article):
+        with step('Checking tags in article'):
+            for tag in article["tags"]:
+                s('.tag-list').should(have.text(tag))
+        return self
 
+    def input_tags(self, article):
+        with step('Add tags'):
+            for tag in article["tags"]:
+                s('[ng-model$=tagField]').type(tag).press_enter()
+        return self
 
-def checking_tags(article):
-    for tag in article["tags"]:
-        browser.element('.tag-list').should(have.text(tag))
+    def delete_tags(self):
+        article_tags = len(ss('.tag-list span'))
+        for tag in range(article_tags):
+            s('[ng-click*=remove]').click()
+        return self
 
+    @staticmethod
+    def open_random_article():
+        with step('Selection of random articles from 1 to 10 per page'):
+            num_article = random.randint(0, 9)
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+        with step('Checking the availability of 10 articles on the page'):
+            ss('article-list .article-preview').wait_until(have.size(10))
+        with step('Click on the title of the article'):
+            article_title = ss('article-list article-preview').element(index=num_article).element('h1')
+            article_title.perform(command.js.scroll_into_view).click()
+        with step('Get article title'):
+            title = article_title.get(query.text_content)
+        with step('Check article'):
+            with step('Checking the url of an open article'):
+                browser.should(have.url_containing(f'/#/article/'))
+            with step('Checking the title of the article'):
+                s('.article-page h1').perform(command.js.scroll_into_view).with_(timeout=4).should(have.text(title))
+            return title
 
-def input_tags(article):
-    for tag in article["tags"]:
-        browser.element('[ng-model$=tagField]').type(tag).press_enter()
+    @staticmethod
+    def selection_of_a_random_article():
+        with step('Checking 10 articles on the tab'):
+            ss('article-list article-preview').should(have.size(10))
 
+        with step('Selection of random articles from 1 to 10 per page'):
+            num_article = random.randint(0, 9)
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+        with step('Get article title'):
+            article_title = (ss('article-list article-preview').element(index=num_article).element('h1')
+                             .get(query.text_content))
+        return article_title
 
-def delete_tags():
-    article_tags = len(browser.all('.tag-list span'))
-    for tag in range(article_tags):
-        browser.element('[ng-click*=remove]').click()
+    @staticmethod
+    def choosing_a_random_tag():
+        with step('Selection of random tag nuber from 1 to 10'):
+            num_tag = random.randint(0, 9)
+        with step('List of tags'):
+            list_tags = ss('.tag-list a').element(index=num_tag)
+        with step('Get tag name'):
+            tag = list_tags.get(query.text_content)
+        with step('Click on the tag'):
+            list_tags.click()
+        return tag
 
+    def checking_selected_tag(self, tag):
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
+            ss('article-list article-preview').first.element('.tag-list li').wait_until(have.text(tag))
 
-def open_random_article():
-    num_article = random.randint(0, 9)
-    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
-    browser.all('article-list article-preview').should(have.size(10))
-    article_title = browser.all('article-list article-preview').element(index=num_article).element('h1')
-    article_title.perform(command.js.scroll_into_view).click()
+        with step('Calculate the number of articles with the selected tag'):
+            articles = len(ss('article-list article-preview'))
 
-    title = article_title.get(query.text_content)
+        with step('Checking the availability of articles with the selected tag'):
+            for i in range(1, articles + 1):
+                (ss(f'article-list article-preview:nth-child({i}) .tag-list li').element_by(have.text(tag))
+                 .should(be.visible))
+        return self
 
-    browser.should(have.url_containing(f'/#/article/'))
-    browser.element('.article-page h1').with_(timeout=4).should(have.text(title))
-    return title
+    def switch_to_random_page(self):
+        with step('Switch to random page'):
+            with step('Choice random page number from 1 to 10'):
+                num_page = random.randint(1, 10)
 
+            with step('Click on the page number'):
+                page_pagination = ss('.pagination li').element(index=num_page)
+                page_pagination.element('a').perform(command.js.scroll_into_view).click()
 
-def selection_of_a_random_article():
-    num_article = random.randint(0, 9)
-    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
-    article_title = (browser.all('article-list article-preview').element(index=num_article).element('h1')
-                     .get(query.text_content))
-    return article_title
+            with step('Checking the activity of the selected page'):
+                page_pagination.should(have.css_class('active'))
+        return self
 
+    def check_articles(self):
+        with step('Checking the display of each card of the article: created date, author, '
+                  'username, avatar, likes count, title, description, tags'):
+            for i in range(1, 11):
+                s(f'article-preview:nth-child({i}) .date').should(be.visible)
+                s(f'article-preview:nth-child({i}) .author').should(be.visible)
+                s(f'article-preview:nth-child({i}) .info').should(be.visible)
+                s(f'article-preview:nth-child({i}) img').get(query.attribute('src'))
+                s(f'article-preview:nth-child({i}) favorite-btn span').should(be.visible)
+                s(f'article-preview:nth-child({i}) h1').should(be.visible)
+                s(f'article-preview:nth-child({i}) p').should(be.visible)
+                s(f'article-preview:nth-child({i}) .tag-list').should(be.visible)
+        return self
 
-def choosing_a_random_tag():
-    num_tag = random.randint(0, 9)
-    list_tags = browser.all('.tag-list a').element(index=num_tag)
-    tag = list_tags.get(query.text_content)
-    list_tags.click()
-    return tag
+    def like_unlike_article(self):
+        with step('Saving the number of likes'):
+            s('.navbar').perform(command.js.scroll_into_view)
+            counter = s('.banner .article-meta favorite-btn .counter')
 
+            amount_of_likes = counter.get(query.text_content)
+            amount = int(re.sub(r'[()]|\s', '', amount_of_likes))
 
-def checking_selected_tag(tag):
-    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=5).should(have.no.visible)
-    articles = len(browser.all('article-list article-preview'))
+        with step('Saving the text of the button'):
+            button_likes = '.banner .article-meta favorite-btn'
+            text = ss(button_likes).first.element('span').get(query.text_content)
+            text = text.strip()
 
-    for i in range(1, articles + 1):
-        (browser.all(f'article-list article-preview:nth-child({i}) .tag-list li').element_by(have.text(tag))
-         .should(be.visible))
+        with step('Click on the button'):
+            s(button_likes).click()
+            s('.article-meta favorite-btn button.disabled').should(be.not_.in_dom)
 
+        with step('Saving the new number of likes'):
+            likes = counter.get(query.text_content)
 
-def switch_to_random_page():
-    num_page = random.randint(1, 9)
-    page_pagination = browser.all('.pagination li').element(index=num_page)
-    page_pagination.element('a').perform(command.js.scroll_into_view).click()
-    page_pagination.should(have.css_class('active'))
+            new_amount_of_likes = int(re.sub(r'[()]|\s', '', likes))
 
+        with step('Checking the number of likes'):
+            if text == 'Favorite Article':
+                assert new_amount_of_likes == amount + 1
+            else:
+                assert new_amount_of_likes == amount - 1
+        return self
 
-def check_articles():
-    for i in range(1, 11):
-        browser.element(f'article-preview:nth-child({i}) .date').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) .author').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) .info').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) img').get(query.attribute('src'))
-        browser.element(f'article-preview:nth-child({i}) favorite-btn span').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) h1').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) p').should(be.visible)
-        browser.element(f'article-preview:nth-child({i}) .tag-list').should(be.visible)
+    def deleting_created_posts(self):
+        app.website.going_to_user_page()
 
+        with step('Checking the display My Articles page'):
+            s('.articles-toggle > ul > li:first-child a').should(be.present).should(
+                have.text('My Articles'))
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(
+                have.no.visible)
+        with step('Checking the availability of created articles'):
+            while s('article-list article-preview').with_(timeout=5).matching(be.visible):
+                self.select_first_article()
 
-def like_unlike_article():
-    browser.element('.navbar').perform(command.js.scroll_into_view)
-    counter = browser.element('.banner .article-meta favorite-btn .counter')
-    button_likes = '.banner .article-meta favorite-btn'
+                with step('Click on the delete button'):
+                    s('.banner .article-meta [ng-click*="delete"]').click()
+                with step('Checking the url display after deleting the article'):
+                    browser.should(have.url_containing('/#/'))
 
-    amount_of_likes = counter.get(query.text_content)
-    amount = int(re.sub(r'[()]|\s', '', amount_of_likes))
+                self.go_to_global_feed_tab()
 
-    text = browser.all(button_likes).first.element('span').get(query.text_content)
-    text = text.strip()
+                app.website.going_to_user_page()
 
-    browser.element(button_likes).click()
-    browser.element('.article-meta favorite-btn button.disabled').should(be.not_.in_dom)
+                with step('Checking the removal of all articles and not displaying on the page'):
+                    s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        return self
 
-    likes = counter.get(query.text_content)
+    def unfollow_subscriptions(self):
+        with step('Checking the display of the "Your Feed" page'):
+            while s('article-list article-preview').with_(timeout=5).matching(be.visible):
+                self.select_first_article()
 
-    new_amount_of_likes = int(re.sub(r'[()]|\s', '', likes))
+                with step('Click on the button "Unfollow"'):
+                    s('.banner .article-meta [user$="article.author"] button').perform(
+                        command.js.scroll_into_view).click()
 
-    if text == 'Favorite Article':
-        assert new_amount_of_likes == amount + 1
-    else:
-        assert new_amount_of_likes == amount - 1
+                with step('Checking the button text "Follow"'):
+                    s('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
+                        have.text('Follow'))
 
+                with step('Get and remember the author name'):
+                    author_name = s('.banner .article-meta .author').get(query.text_content)
 
-def deleting_created_posts():
-    while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
-        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
-        browser.element('.banner .article-meta [ng-click*="delete"]').click()
-        browser.should(have.url_containing('/#/'))
-        browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active'))
-        browser.element(f'.navbar [href="#/@{user_name}"]').with_(timeout=5).click()
+                app.website.go_to_home_page()
 
-        browser.should(have.url_containing(f'/#/@{user_name}')).with_(timeout=5)
-        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+                self.go_to_your_feed_tab()
 
+                with step('Checking the absence of the name of the unsubscribed author'):
+                    ss('.article-preview .article-meta a.author').element_by(have.text(author_name)).should(
+                        be.not_.visible)
+        return self
 
-def unfollow_subscriptions():
-    while browser.element('article-list article-preview').with_(timeout=5).matching(be.visible):
-        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
-        browser.element('.banner .article-meta [user$="article.author"] button').perform(
-            command.js.scroll_into_view).click()
-        browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
-            have.text('Follow'))
-        author_name = browser.element('.banner .article-meta .author').get(query.text_content)
+    def follow_subscriptions(self):
+        if s('article-list article-preview').with_(timeout=7).matching(be.not_.visible):
+            with step('Select first article'):
+                self.go_to_global_feed_tab()
+                self.select_first_article()
 
-        browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
-        browser.should(have.url_containing('/#/'))
-        browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active')).should(
-            have.text('Your Feed'))
-        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
-        browser.all('.article-preview .article-meta a.author').element_by(
-            have.text(author_name)).should(be.not_.visible)
+            with step('Click on the button "Follow"'):
+                s('.banner .article-meta [user$="article.author"] button').perform(
+                    command.js.scroll_into_view).should(have.text('Follow')).click()
 
+            with step('Get and remember the author name'):
+                author_name = s('.banner .article-meta .author').get(query.text_content)
+            with step('Checking the button text "Unfollow"'):
+                s('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
+                    have.text('Unfollow'))
 
-def follow_subscriptions():
-    if browser.element('article-list article-preview').with_(timeout=5).matching(be.not_.visible):
-        browser.element('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active')).should(
-            have.text('Global Feed'))
-        browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
-        browser.all('article-list article-preview').with_(timeout=5).should(have.size(10))
+            with step('Check user in your subscription list'):
+                app.website.go_to_home_page()
 
-        browser.element('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
-        browser.element('.banner .article-meta [user$="article.author"] button').perform(
-            command.js.scroll_into_view).should(have.text('Follow')).click()
-        author_name = browser.element('.banner .article-meta .author').get(query.text_content)
-        browser.element('.banner .article-meta [user$="article.author"] button').with_(timeout=5).should(
-            have.text('Unfollow'))
+                self.go_to_your_feed_tab()
 
-        browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
-        browser.should(have.url_containing('/#/'))
+                with step("Check the author's name must be visible on the page"):
+                    ss('.article-preview .article-meta a.author').element_by(have.text(author_name)).should(be.visible)
+        return self
 
-        browser.element('.feed-toggle ul > li:nth-child(1) a').should(have.css_class('active')).should(
-            have.text('Your Feed'))
-        browser.element('article-list article-preview').with_(timeout=5).should(be.visible)
+    def go_to_your_feed_tab(self):
+        with step('Checking the display of the "Your Feed" page'):
+            s('.feed-toggle ul > li:nth-child(1) a').should(have.css_class('active')).should(
+                have.text('Your Feed'))
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        return self
 
-        browser.all('.article-preview .article-meta a.author').element_by(have.text(author_name)).should(be.visible)
+    def go_to_global_feed_tab(self):
+        with step('Click on the "Global Feed" tab'):
+            s('.feed-toggle ul > li:nth-child(2) a').click().should(have.css_class('active')).should(
+                have.text('Global Feed'))
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        with step('Checking 10 articles on the tab'):
+            ss('article-list article-preview').should(have.size(10))
+        return self
 
+    def select_first_article(self):
+        with step('Select and click first article title'):
+            s('article-list article-preview:nth-child(1) h1').with_(timeout=5).click()
+        with step('Checking the url display the article'):
+            browser.with_(timeout=5).should(have.url_containing('/#/article/'))
+        return self
 
+    def check_article_list(self):
+        with step('Checking the display of the "Global Feed" page'):
+            s('.feed-toggle ul > li:nth-child(2) a').should(have.css_class('active')).should(
+                have.text('Global Feed'))
+        with step('Checking no showing loader on page'):
+            s('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+        with step('Checking 10 articles on the tab'):
+            ss('article-list article-preview').should(have.size(10))
+        return self
+
+    @staticmethod
+    def add_comment():
+        with step('Generate random article data'):
+            article = generate_random_article()
+        with step('Scrolling and add comment to article'):
+            s('textarea[ng-model$=body]').perform(command.js.scroll_into_view).click().type(article["comments"])
+        with step('Click on post comment'):
+            s('button[type=submit]').click()
+        with step('Check that comment was added'):
+            s('comment .card').perform(command.js.scroll_into_view)
+            ss('.article-page comment').with_(timeout=5).element_by_its('p', have.text(article["comments"]))
+        return article
+
+    def open_add_new_article_page(self):
+        with step('Click on New Article'):
+            s('[href="#/editor/"]').click()
+        with step('Checking url'):
+            browser.should(have.url_containing('/#/editor/'))
+        with step('Checking the display of the form'):
+            s('.editor-page form').should(be.visible)
+        return self
+
+    def check_article_data(self, article):
+        with step('Checking the url'):
+            url_title = article["title"].replace(" ", "-")
+            browser.should(have.url_containing(f'/#/article/{url_title}'))
+        with step('Checking the title'):
+            s('.banner h1').should(have.text(article["title"]))
+        with step('Checking body'):
+            s('[ng-bind-html$=body]').should(have.text(article["body"]))
+        with step('Checking the tags'):
+            self.checking_tags(article)
+        return self

@@ -1,43 +1,40 @@
 from selene import browser, be, have
 from demo_apps_project_tests.model.authorization import login_user
-from demo_apps_project_tests.model.article import fill_article
-from tests.conftest import dotenv
-
-user_name = dotenv.get('USERNAME')
+from demo_apps_project_tests.helpers import app
+from allure import step
+from selene.support.shared.jquery_style import s, ss
 
 
 def test_delete_article(browser_management):
-    login_user()
+    with step('Before'):
+        login_user()
 
-    browser.should(have.url_containing('/#/'))
+    with step('Add article'):
+        app.article_page.open_add_new_article_page()
+        with step('Fill form'):
+            article = app.article_page.fill_article()
+        with step('Checking created article'):
+            url_title = article["title"].replace(" ", "-")
+            browser.should(have.url_containing(f'/#/article/{url_title}'))
 
-    browser.element('[href="#/editor/"]').click()
-    browser.should(have.url_containing('/#/editor/'))
+    with step('Open me profile'):
+        app.website.going_to_user_page()
 
-    browser.element('.editor-page').should(be.visible)
+    with step('Find my article'):
+        with step('Checking page activity'):
+            s('.articles-toggle > ul > li:first-child a').with_(timeout=6).should(have.css_class('active'))
+        with step('Open article'):
+            app.article_page.select_first_article()
 
-    article = fill_article()
+    with step('Delete article'):
+        with step('Click delete article button'):
+            s('.article-actions span:not(.ng-hide) button').click()
+        with step('Checking url and showing Your Feed tab'):
+            browser.should(have.url_containing('/#/')).with_(timeout=5)
+            s('article-list .article-preview').should(be.present)
 
-    url_title = article["title"].replace(" ", "-")
-    browser.should(have.url_containing(f'/#/article/{url_title}'))
+    with step('Check article has been deleted'):
+        app.website.going_to_user_page()
 
-    browser.element(f'.navbar [href="#/@{user_name}"]').with_(timeout=5).click()
-    browser.should(have.url_containing(f'/#/@{user_name}'))
-
-    browser.element('.articles-toggle > ul > li:first-child a').should(be.present)
-
-    browser.all('article-preview').element_by_its('.preview-link', be.visible).element('h1').click()
-
-    browser.element('.article-actions span:not(.ng-hide) button').click()
-    browser.should(have.url_containing('/#/')).with_(timeout=5)
-    browser.element('article-list article-preview').should(be.visible)
-
-    browser.element(f'.navbar [href="#/@{user_name}"]').with_(timeout=5).click()
-    browser.should(have.url_containing(f'/#/@{user_name}'))
-
-    browser.all('article-list').element('article-preview h1').should(have.no.text(article["title"]))
-
-
-
-
-
+        with step('Verify that article is not in the list'):
+            ss('article-list').element_by_its('article-preview h1', have.no.text(article["title"]))

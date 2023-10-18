@@ -1,27 +1,21 @@
-from selene import browser, have, be
-from demo_apps_project_tests.model.article import deleting_created_posts, unfollow_subscriptions, follow_subscriptions
-from demo_apps_project_tests.model.authorization import login_user, user_name
+from allure import step
+from demo_apps_project_tests.model.authorization import login_user
+from demo_apps_project_tests.helpers import app
 
 
 def test_subscribe_to_user(browser_management):
-    login_user()
+    with step('Before'):
+        login_user()
 
-    browser.element(f'.navbar [href="#/@{user_name}"]').with_(timeout=5).click()
-    browser.should(have.url_containing(f'/#/@{user_name}'))
+    with step('Delete all my articles'):
+        app.article_page.deleting_created_posts()
 
-    browser.element('.articles-toggle > ul > li:first-child a').should(be.present).should(have.text('My Articles'))
+    with step('Checking for a subscription'):
+        app.website.go_to_home_page()
+        app.article_page.go_to_your_feed_tab()
 
-    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
+    with step('Unsubscribe from user by unfollowing him'):
+        app.article_page.unfollow_subscriptions()
 
-    deleting_created_posts()
-
-    browser.element('.navbar [show-authed="true"] a[href="#/"]').click()
-    browser.should(have.url_containing('/#/'))
-
-    browser.element('.feed-toggle ul > li:nth-child(1) a').click().should(have.css_class('active')).should(
-        have.text('Your Feed'))
-    browser.element('article-list .article-preview[ng-hide$="loading"]').with_(timeout=7).should(have.no.visible)
-
-    unfollow_subscriptions()
-
-    follow_subscriptions()
+    with step('Subscribe to user by following him'):
+        app.article_page.follow_subscriptions()

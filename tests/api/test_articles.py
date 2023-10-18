@@ -1,4 +1,4 @@
-from demo_apps_project_tests.data.fake_data import *
+from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.model.article import create_article
 from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
@@ -50,7 +50,12 @@ def test_most_recent_articles():
 @tag('API')
 @title("Create an article")
 def test_create_an_article():
+    article_data = generate_random_article()
     user_data = user_authorization()
+    title_article = article_data["title"]
+    description_article = article_data["description"]
+    body_article = article_data["body"]
+    tags_article = article_data["tags"]
     token = user_data["token"]
     data = {
         "article": {

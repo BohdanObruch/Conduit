@@ -15,7 +15,7 @@ Unsubscribe from user test case
     * click button **Delete**
     * go to step 4
 
-## Checking for a subscribtion
+## Checking for a subscription
 
 6.  In feed toggle menu should be active **Your Feed**
 7.  Your Feed contains text "No articles are here... yet"?
