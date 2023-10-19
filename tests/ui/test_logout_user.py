@@ -4,7 +4,7 @@ from allure import step
 from selene.support.shared.jquery_style import s
 
 
-def test_logout_user(browser_management):
+def test_logout_user(setup_browser):
     with step('Before'):
         login_user()
 

@@ -3,7 +3,7 @@ from demo_apps_project_tests.helpers import app
 from allure import step
 
 
-def test_add_comment(browser_management):
+def test_add_comment(setup_browser):
     with step('Before'):
         login_user()
 

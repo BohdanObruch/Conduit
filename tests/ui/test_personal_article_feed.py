@@ -5,7 +5,7 @@ from allure import step
 from demo_apps_project_tests.helpers import app
 
 
-def test_personal_article_feed(browser_management):
+def test_personal_article_feed(setup_browser):
     with step('Before'):
         login_user()
 

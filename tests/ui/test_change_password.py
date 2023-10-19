@@ -5,7 +5,7 @@ from selene.support.shared.jquery_style import s
 from demo_apps_project_tests.helpers import app
 
 
-def test_change_password(browser_management):
+def test_change_password(setup_browser):
     with step('Before'):
         user = registration_user()
 

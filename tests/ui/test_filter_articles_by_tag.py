@@ -4,7 +4,7 @@ from selene.support.shared.jquery_style import s, ss
 from demo_apps_project_tests.helpers import app
 
 
-def test_filter_articles_by_tag(browser_management):
+def test_filter_articles_by_tag(setup_browser):
     with step('Before'):
         app.website.open_website()
 

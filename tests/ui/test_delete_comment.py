@@ -6,7 +6,7 @@ from selene.support.shared.jquery_style import ss
 from demo_apps_project_tests.helpers import app
 
 
-def test_delete_comment(browser_management):
+def test_delete_comment(setup_browser):
     with step('Before'):
         login_user()
 

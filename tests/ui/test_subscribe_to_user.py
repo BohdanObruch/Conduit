@@ -3,7 +3,7 @@ from demo_apps_project_tests.model.authorization import login_user
 from demo_apps_project_tests.helpers import app
 
 
-def test_subscribe_to_user(browser_management):
+def test_subscribe_to_user(setup_browser):
     with step('Before'):
         login_user()
 

@@ -2,7 +2,7 @@ from allure import step
 from demo_apps_project_tests.helpers import app
 
 
-def test_open_article_detail_page(browser_management):
+def test_open_article_detail_page(setup_browser):
     with step('Before'):
         app.website.open_website()
 

@@ -5,7 +5,7 @@ from selene.support.shared.jquery_style import s
 from demo_apps_project_tests.helpers import app
 
 
-def test_edit_article(browser_management):
+def test_edit_article(setup_browser):
     with step('Before'):
         login_user()
 

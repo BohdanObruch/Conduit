@@ -3,7 +3,7 @@ from allure import step
 from demo_apps_project_tests.helpers import app
 
 
-def test_publish_article(browser_management):
+def test_publish_article(setup_browser):
     with step('Before'):
         login_user()
 

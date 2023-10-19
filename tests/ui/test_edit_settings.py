@@ -5,7 +5,7 @@ from selene.support.shared.jquery_style import s
 from demo_apps_project_tests.helpers import app
 
 
-def test_edit_settings(browser_management):
+def test_edit_settings(setup_browser):
     with step('Before'):
         registration_user()
 

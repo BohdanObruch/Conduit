@@ -4,7 +4,7 @@ from selene.support.shared.jquery_style import ss
 from demo_apps_project_tests.helpers import app
 
 
-def test_navigate_in_list_by_pagination(browser_management):
+def test_navigate_in_list_by_pagination(setup_browser):
     with step('Before'):
         app.website.open_website()
 
