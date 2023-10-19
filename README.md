@@ -113,7 +113,7 @@ Pipeline project with the following settings
 
 ##  The build parameters in Jenkins:
 
-* TESTS_FOLDER  (Selecting the folder to run the tests)
+* BROWSER_NAME  (browser name, the default is chrome)
 * BROWSER_VERSION (browser version, the default is 106.0)
 
 <p align="center">
