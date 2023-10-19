@@ -1,5 +1,5 @@
 from demo_apps_project_tests.data.fake_data import generate_random_article
-from demo_apps_project_tests.model.article import create_article
+from demo_apps_project_tests.model.article import create_article, slug
 from demo_apps_project_tests.model.authorization import user_authorization
 from schemas.conduit import *
 from pytest_voluptuous import S
@@ -7,7 +7,7 @@ from demo_apps_project_tests.utils.sessions import conduit
 from allure import tag, title
 from tests.conftest import dotenv
 
-slug = dotenv.get('SLUG')
+
 tag_name = dotenv.get('TAG_NAME')
 author = dotenv.get('AUTHOR')
 
@@ -136,4 +136,3 @@ def test_delete_an_article():
                                 )
     assert response.status_code == 204
     assert response.text == ""
-
