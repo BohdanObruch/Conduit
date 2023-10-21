@@ -32,10 +32,10 @@ def test_like_article():
             app.article_page.go_to_global_feed_tab()
 
     with step('Select random article'):
-        app.article_page.open_random_article()
+        article_title = app.article_page.selection_of_a_random_article()
 
     with step('Like/unlike article'):
-        app.article_page.like_unlike_article()
+        app.article_page.like_unlike_article(article_title)
 
 
 def test_navigate_in_list_by_pagination():

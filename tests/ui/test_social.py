@@ -38,8 +38,7 @@ def test_personal_article_feed():
 
     with step('Follow author'):
         with step('Click Follow on author'):
-            s('.banner .article-meta [user$="article.author"] button').perform(
-                command.js.scroll_into_view).should(have.text('Follow')).click()
+            app.article_page.check_subscription()
         with step('Get author name'):
             author_name = s('.banner .article-meta .author').get(query.text_content)
         with step('Checking Follow on author'):

@@ -1,4 +1,3 @@
-import re
 import random
 from demo_apps_project_tests.data.fake_data import generate_random_article
 from demo_apps_project_tests.helpers import app
@@ -136,30 +135,24 @@ class ArticlePage:
                 s(f'article-preview:nth-child({i}) .tag-list').should(be.visible)
         return self
 
-    def like_unlike_article(self):
+    def like_unlike_article(self, article_title):
         with step('Saving the number of likes'):
-            s('.navbar').perform(command.js.scroll_into_view)
-            counter = s('.banner .article-meta favorite-btn .counter')
+            random_article = ss('article-list article-preview').element_by_its('h1', have.exact_text(article_title))
+            random_article.perform(command.js.scroll_into_view)
+            button = random_article.element('favorite-btn span')
 
-            amount_of_likes = counter.get(query.text_content)
-            amount = int(re.sub(r'[()]|\s', '', amount_of_likes))
-
-        with step('Saving the text of the button'):
-            button_likes = '.banner .article-meta favorite-btn'
-            text = ss(button_likes).first.element('span').get(query.text_content)
-            text = text.strip()
+            amount = int(button.get(query.text_content))
 
         with step('Click on the button'):
-            s(button_likes).click()
+            random_article.element('favorite-btn').click()
             s('.article-meta favorite-btn button.disabled').should(be.not_.in_dom)
 
         with step('Saving the new number of likes'):
-            likes = counter.get(query.text_content)
-
-            new_amount_of_likes = int(re.sub(r'[()]|\s', '', likes))
+            new_amount_of_likes = int(button.get(query.text_content))
 
         with step('Checking the number of likes'):
-            if text == 'Favorite Article':
+            status_like = random_article.element('button.btn-primary')
+            if status_like.matching(be.present) is True:
                 assert new_amount_of_likes == amount + 1
             else:
                 assert new_amount_of_likes == amount - 1
@@ -308,4 +301,11 @@ class ArticlePage:
             s('[ng-bind-html$=body]').should(have.text(article["body"]))
         with step('Checking the tags'):
             self.checking_tags(article)
+        return self
+
+    def check_subscription(self):
+        follow_button = s('.banner .article-meta [user$="article.author"] button')
+        if follow_button.perform(command.js.scroll_into_view).matching(have.text('Unfollow')):
+            follow_button.click()
+        follow_button.perform(command.js.scroll_into_view).should(have.text('Follow')).click()
         return self

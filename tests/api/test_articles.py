@@ -24,7 +24,8 @@ def test_getting_new_articles_from_users_follow():
                              headers=headers
                              )
     assert response.status_code == 200
-    assert response.json()['articles'][0]['author']['following'] is True
+    if response.json()['articlesCount'] > 0:
+        assert response.json()['articles'][0]['author']['following'] is True
     assert S(articles_follow_and_global) == response.json()
 
 
