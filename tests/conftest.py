@@ -33,48 +33,25 @@ def browser_management():
 
 
 DEFAULT_BROWSER_VERSION = "116.0"
-DEFAULT_BROWSER = 'chrome'
 
 
 def pytest_addoption(parser):
     parser.addoption(
-        '--browser_name',
-        default=DEFAULT_BROWSER,
-        help='web: browser (chrome | firefox)'
-    )
-
-    parser.addoption(
         '--browser_version',
-        default=DEFAULT_BROWSER_VERSION,
-        help='web: browser version (if chrome: 114.0, 116.0, 117.0; firefox: 116.0, 117.0)'
+        default='116.0'
     )
-
-
-@pytest.fixture(scope='session')
-def get_option_browser_name(request):
-    return request.config.getoption('--browser_name')
-
-
-@pytest.fixture(scope='session')
-def get_option_browser_version(request):
-    return request.config.getoption('--browser_version')
 
 
 @pytest.fixture(scope='function')
-def setup_browser(request, get_option_browser_name, get_option_browser_version):
+def setup_browser(request):
     browser.config.base_url = os.getenv('selene.base_url', web_url)
     browser.config.window_width = 1920
     browser.config.window_height = 1080
-
-    browser_name = get_option_browser_name
-    browser_name = browser_name if browser_name != '' else DEFAULT_BROWSER
-
-    browser_version = get_option_browser_version
+    browser_version = request.config.getoption('--browser_version')
     browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
-
     options = Options()
     selenoid_capabilities = {
-        "browserName": browser_name,
+        "browserName": "chrome",
         "browserVersion": browser_version,
         "selenoid:options": {
             "enableVNC": True,
