@@ -46,7 +46,7 @@ def pytest_addoption(parser):
     parser.addoption(
         '--browser_version',
         default=DEFAULT_BROWSER_VERSION,
-        help='web: browser version (if chrome: 110.0, 112.0; firefox: 110.0, 112.0)'
+        help='web: browser version (if chrome: 114.0, 116.0, 117.0; firefox: 116.0, 117.0)'
     )
 
 
