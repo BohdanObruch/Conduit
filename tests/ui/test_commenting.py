@@ -5,7 +5,7 @@ from demo_apps_project_tests.model.authorization import login_user
 from demo_apps_project_tests.helpers import app
 
 
-def test_add_comment():
+def test_add_comment(setup_browser):
     with step('Before'):
         login_user()
 
@@ -19,7 +19,7 @@ def test_add_comment():
         app.article_page.add_comment()
 
 
-def test_delete_comment():
+def test_delete_comment(setup_browser):
     with step('Before'):
         login_user()
 

@@ -12,7 +12,7 @@ password = dotenv.get('PASSWORD')
 username = dotenv.get('USERNAME')
 
 
-def test_registration_user():
+def test_registration_user(setup_browser):
     with step('Open main page'):
         browser.open('/')
 
@@ -44,7 +44,7 @@ def test_registration_user():
             s('.navbar').should(have.text(user_data["username"]))
 
 
-def test_login_user():
+def test_login_user(setup_browser):
     with step('Open website'):
         browser.open('/')
 
@@ -75,7 +75,7 @@ def test_login_user():
             browser.should(have.url_containing('/#/'))
 
 
-def test_logout_user():
+def test_logout_user(setup_browser):
     with step('Before'):
         login_user()
 

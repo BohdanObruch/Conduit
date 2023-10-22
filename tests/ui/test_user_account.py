@@ -5,7 +5,7 @@ from selene.support.shared.jquery_style import s
 from demo_apps_project_tests.helpers import app
 
 
-def test_edit_settings():
+def test_edit_settings(setup_browser):
     with step('Before'):
         registration_user()
 
@@ -31,7 +31,7 @@ def test_edit_settings():
             s('.user-info img').should(have.attribute('src', user["picture"]))
 
 
-def test_change_password():
+def test_change_password(setup_browser):
     with step('Before'):
         user = registration_user()
 

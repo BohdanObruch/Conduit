@@ -1,11 +1,11 @@
 from allure import step
 from demo_apps_project_tests.model.authorization import login_user
 from demo_apps_project_tests.helpers import app
-from selene import browser, have, be, command, query
+from selene import browser, have, be, query
 from selene.support.shared.jquery_style import s, ss
 
 
-def test_subscribe_to_user():
+def test_subscribe_to_user(setup_browser):
     with step('Before'):
         login_user()
 
@@ -23,7 +23,7 @@ def test_subscribe_to_user():
         app.article_page.follow_subscriptions()
 
 
-def test_personal_article_feed():
+def test_personal_article_feed(setup_browser):
     with step('Before'):
         login_user()
 
@@ -53,7 +53,7 @@ def test_personal_article_feed():
             ss('.article-preview .article-meta a.author').element_by(have.text(author_name)).should(be.visible)
 
 
-def test_unsubscribe_from_user():
+def test_unsubscribe_from_user(setup_browser):
     with step('Before'):
         login_user()
 

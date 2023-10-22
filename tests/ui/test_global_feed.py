@@ -5,7 +5,7 @@ from selene import have, command
 from selene.support.shared.jquery_style import s, ss
 
 
-def test_display_article_list():
+def test_display_article_list(setup_browser):
     with step('Before'):
         app.website.open_website()
 
@@ -16,7 +16,7 @@ def test_display_article_list():
         app.article_page.check_articles()
 
 
-def test_open_article_detail_page():
+def test_open_article_detail_page(setup_browser):
     with step('Before'):
         app.website.open_website()
 
@@ -24,7 +24,7 @@ def test_open_article_detail_page():
         app.article_page.open_random_article()
 
 
-def test_like_article():
+def test_like_article(setup_browser):
     with step('Before'):
         login_user()
 
@@ -38,7 +38,7 @@ def test_like_article():
         app.article_page.like_unlike_article(article_title)
 
 
-def test_navigate_in_list_by_pagination():
+def test_navigate_in_list_by_pagination(setup_browser):
     with step('Before'):
         app.website.open_website()
 
@@ -64,7 +64,7 @@ def test_navigate_in_list_by_pagination():
             ss('article-list article-preview').element_by_its('h1', have.text(article_title))
 
 
-def test_filter_articles_by_tag():
+def test_filter_articles_by_tag(setup_browser):
     with step('Before'):
         app.website.open_website()
 

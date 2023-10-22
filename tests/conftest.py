@@ -42,7 +42,7 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function')
 def setup_browser(request):
     browser.config.base_url = os.getenv('selene.base_url', web_url)
     browser.config.window_width = 1920

@@ -5,7 +5,7 @@ from selene import browser, be, have
 from selene.support.shared.jquery_style import s, ss
 
 
-def test_publish_article():
+def test_publish_article(setup_browser):
     with step('Before'):
         login_user()
 
@@ -20,7 +20,7 @@ def test_publish_article():
         app.article_page.check_article_data(article)
 
 
-def test_delete_article():
+def test_delete_article(setup_browser):
     with step('Before'):
         login_user()
 
@@ -55,7 +55,7 @@ def test_delete_article():
             ss('article-list').element_by_its('article-preview h1', have.no.text(article["title"]))
 
 
-def test_edit_article():
+def test_edit_article(setup_browser):
     with step('Before'):
         login_user()
 
