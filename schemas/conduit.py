@@ -2,6 +2,7 @@ from voluptuous import Schema, Any, ALLOW_EXTRA, PREVENT_EXTRA
 
 user = Schema({
     "user": {
+        "id": int,
         "email": str,
         "username": str,
         "bio": Any(None, str),
